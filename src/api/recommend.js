@@ -17,7 +17,7 @@ export function getRecommand() {
     return jsonp(url, data, options)
 }
 
-export function getPlayList() {
+export function getdiscList() {
     const url = '/api/getPlayList'
 
     const data = Object.assign({}, commonParams, {
