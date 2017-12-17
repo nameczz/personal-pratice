@@ -29,7 +29,15 @@ export default new Router({
       path: '/rank',
       component: function(resolve) {
         require(['components/rank/rank'], resolve)
-      }
+      },
+      children: [
+        {
+          path: ':id',
+          component: function(resolve) {
+            require(['components/top-list/top-list'], resolve)
+          }
+        }
+      ]
     },
     {
       path: '/search',
