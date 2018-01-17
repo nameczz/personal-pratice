@@ -43,7 +43,15 @@ export default new Router({
       path: '/search',
       component: function(resolve) {
         require(['components/search/search'], resolve)
-      }
+      },
+      children: [
+        {
+          path: ':id',
+          component: function(resolve) {
+            require(['components/singer-detail/singer-detail'], resolve)
+          }
+        }
+      ]
     },
     {
       path: '/singer',

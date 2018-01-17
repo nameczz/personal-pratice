@@ -1,78 +1,99 @@
 <template>
-    <div ref="wrapper">
-        <slot></slot>
-    </div>
+	<div ref="wrapper">
+		<slot></slot>
+	</div>
 </template>
 
 <script type="text/ecmascript-6">
-import BSroll from 'better-scroll'
+    import BSroll from 'better-scroll'
 
-export default {
-    props: {
+    export default {
+      props: {
         probeType: {
-            type: Number,
-            default: 1
+          type: Number,
+          default: 1
         },
         click: {
-            type: Boolean,
-            default: true
+          type: Boolean,
+          default: true
         },
         data: {
-            type: Array,
-            default: null
+          type: Array,
+          default: null
         },
         listenScroll: {
-            type: Boolean,
-            default: false
+          type: Boolean,
+          default: false
+        },
+        pullup: {
+          type: Boolean,
+          default: false
+        },
+        beforeScroll: {
+          type: Boolean,
+          default: false
         }
-    },
-    mounted() {
+      },
+      mounted() {
         setTimeout(() => {
-            this._initScroll()
+          this._initScroll()
         }, 20)
-    },
-    methods: {
+      },
+      methods: {
         _initScroll() {
-            if (!this.$refs.wrapper) {
-                return
-            }
-            this.scroll = new BSroll(this.$refs.wrapper, {
-                probeType: this.probeType,
-                click: this.click
+          if (!this.$refs.wrapper) {
+            return
+          }
+          this.scroll = new BSroll(this.$refs.wrapper, {
+            probeType: this.probeType,
+            click: this.click
+          })
+          if (this.listenScroll) {
+            let me = this
+            this.scroll.on('scroll', pos => {
+              me.$emit('scroll', pos)
             })
-            if (this.listenScroll) {
-                let me = this
-                this.scroll.on('scroll', (pos) => {
-                    me.$emit('scroll', pos)
-                })
-            }
+          }
+
+          if (this.pullup) {
+            this.scroll.on('scrollEnd', () => {
+              if (this.scroll.y <= this.scroll.maxScrollY + 50) {
+                this.$emit('scrollToEnd')
+              }
+            })
+          }
+
+          if (this.beforeScroll) {
+            this.scroll.on('beforeScrollStart', () => {
+              this.$emit('beforeScroll')
+            })
+          }
         },
         enable() {
-            this.scroll && this.scroll.enable()
+          this.scroll && this.scroll.enable()
         },
         disable() {
-            this.scroll && this.scroll.disable()
+          this.scroll && this.scroll.disable()
         },
         refresh() {
-            this.scroll && this.scroll.refresh()
+          this.scroll && this.scroll.refresh()
         },
         scrollTo() {
-            this.scroll && this.scroll.scrollTo.apply(this.scroll, arguments)
+          this.scroll && this.scroll.scrollTo.apply(this.scroll, arguments)
         },
         scrollToElement() {
-            this.scroll && this.scroll.scrollToElement.apply(this.scroll, arguments)
+          this.scroll && this.scroll.scrollToElement.apply(this.scroll, arguments)
         }
-    },
-    watch: {
+      },
+      watch: {
         data() {
-            setTimeout(() => {
-                this.refresh()
-            }, 20)
+          setTimeout(() => {
+            this.refresh()
+          }, 20)
         }
+      }
     }
-}
 </script>
 
 <style scoped lang="stylus" rel="stylesheet/stylus">
-
 </style>
