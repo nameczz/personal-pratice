@@ -1,9 +1,6 @@
-import { getLyric, getVKey } from 'api/song'
+import { getLyric, getSongsUrl } from 'api/song'
 import { ERR_OK } from 'api/config'
 import { Base64 } from 'js-base64'
-import { getUid } from './uid'
-
-let urlMap = {}
 
 export default class Song {
   constructor({ id, mid, singer, name, album, duration, image, url }) {
@@ -15,12 +12,7 @@ export default class Song {
     this.duration = duration
     this.image = image
     this.filename = `C400${this.mid}.m4a`
-    // 确保一首歌曲的 id 只对应一个 url
-    if (urlMap[this.id]) {
-      this.url = urlMap[this.id]
-    } else {
-      this._genUrl()
-    }
+    this.url = url
   }
 
   getLyric() {
@@ -38,21 +30,6 @@ export default class Song {
       })
     })
   }
-
-  _genUrl() {
-    if (this.url) {
-      return
-    }
-    getVKey(this.mid, this.filename).then(res => {
-      if (res.code === ERR_OK) {
-        const vkey = res.data.items[0].vkey
-        this.url = `http://dl.stream.qqmusic.qq.com/${
-          this.filename
-        }?vkey=${vkey}&guid=${getUid()}&uin=0&fromtag=66`
-        urlMap[this.id] = this.url
-      }
-    })
-  }
 }
 
 // 工厂方法
@@ -66,7 +43,8 @@ export function createSong(musicData) {
     duration: musicData.interval,
     image: `https://y.gtimg.cn/music/photo_new/T002R300x300M000${
       musicData.albummid
-    }.jpg?max_age=2592000`
+    }.jpg?max_age=2592000`,
+    url: musicData.url
   })
 }
 
@@ -80,4 +58,34 @@ export function filterSinger(singer) {
   })
 
   return ret.join('/')
+}
+
+export function isValidMusic(musicData) {
+  return (
+    musicData.songid &&
+    musicData.albummid &&
+    (!musicData.pay || musicData.pay.payalbumprice === 0)
+  )
+}
+
+export function processSongsUrl(songs) {
+  if (!songs.length) {
+    return Promise.resolve(songs)
+  }
+  return getSongsUrl(songs).then(purlMap => {
+    songs = songs.filter(song => {
+      const purl = purlMap[song.mid]
+      console.log(purl)
+
+      if (purl) {
+        song.url =
+          purl.indexOf('http') === -1
+            ? `http://dl.stream.qqmusic.qq.com/${purl}`
+            : purl
+        return true
+      }
+      return false
+    })
+    return songs
+  })
 }
