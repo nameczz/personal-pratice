@@ -51,7 +51,6 @@ export function getVKey(songmid, filename) {
 }
 
 export function getSongsUrl(songs) {
-  console.log(songs)
   const url = debug
     ? '/api/getPurlUrl'
     : 'http://ustbhuangyi.com/music/api/getPurlUrl'
@@ -73,7 +72,6 @@ export function getSongsUrl(songs) {
     needNewCode: 1,
     uin: 0
   })
-  console.log(urlMid)
   return new Promise((resolve, reject) => {
     let tryTime = 3
 

@@ -81,10 +81,10 @@ import { getHotKey } from 'api/search'
 import { ERR_OK } from 'api/config'
 import Scroll from 'base/scroll/scroll'
 import Confirm from 'base/confirm/confirm'
-import { playlistMixin } from 'common/js/mixin'
-import { mapActions, mapGetters } from 'vuex'
+import { playlistMixin, searchMixins } from 'common/js/mixin'
+import { mapActions } from 'vuex'
 export default {
-  mixins: [playlistMixin],
+  mixins: [playlistMixin, searchMixins],
   components: {
     SearchBox,
     Suggest,
@@ -104,8 +104,7 @@ export default {
   computed: {
     shotcut() {
       return this.hotKey.concat(this.searchHistory)
-    },
-    ...mapGetters(['searchHistory'])
+    }
   },
   watch: {
     query(newQuery) {
@@ -126,20 +125,7 @@ export default {
       this.$refs.searchResult.style.bottom = bottom
       this.$refs.suggest.refresh()
     },
-    addQuery(query) {
-      this.$refs.searchBox.setQuery(query)
-    },
-    onQueryChange(query) {
-      this.query = query
-    },
-    // 关闭手机键盘 派发了2个事件上来
-    blurInput() {
-      this.$refs.searchBox.blur()
-    },
-    saveSearch() {
-      console.log('in')
-      this.saveSearchHistory(this.query)
-    },
+
     showConfirm() {
       this.$refs.confirm.show()
     },
@@ -150,11 +136,7 @@ export default {
         }
       })
     },
-    ...mapActions([
-      'saveSearchHistory',
-      'delectSearchHistory',
-      'clearSearchHistory'
-    ])
+    ...mapActions(['clearSearchHistory'])
   }
 }
 </script>
