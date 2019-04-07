@@ -18,10 +18,11 @@
         <search-box
           @query="onQueryChange"
           placeholder="搜索歌曲"
+          ref="searchBox"
         ></search-box>
       </div>
       <div
-        class="shortcur"
+        class="shortcut"
         v-show="!query"
       >
         <switchs
@@ -29,6 +30,36 @@
           :switches="tabs"
           @switch="changeIndex"
         ></switchs>
+        <div class="list-wrapper">
+          <scroll
+            :data="playHistory"
+            class="list-scroll"
+            ref="songList"
+            v-if="currentIndex===0"
+          >
+            <div class="list-inner">
+              <song-list
+                :songs="playHistory"
+                @select="selectSong"
+              ></song-list>
+            </div>
+          </scroll>
+          <scroll
+            :data="searchHistory"
+            class="list-scroll"
+            ref="searchList"
+            v-if="currentIndex===1"
+          >
+            <div class="list-inner">
+              <search-list
+                :refreshTime="100"
+                :searches="searchHistory"
+                @delete="delectSearchHistory"
+                @select="addQuery"
+              ></search-list>
+            </div>
+          </scroll>
+        </div>
       </div>
       <div
         class="search-result"
@@ -36,10 +67,17 @@
       >
         <suggest
           :query="query"
-          :showSinger="false"
-          @select="saveSearch"
+          :showSinger="showSinger"
+          @listScroll="blurInput"
+          @select="selectSuggest"
         ></suggest>
       </div>
+      <top-tip ref="topTip">
+        <div class="tip-title">
+          <i class="icon-ok"></i>
+          <span class="text">1首歌曲已经添加到播放列表</span>
+        </div>
+      </top-tip>
     </div>
   </transition>
 </template>
@@ -47,27 +85,69 @@
 import SearchBox from 'base/search-box/search-box'
 import Switchs from 'base/switchs/switchs'
 import Suggest from 'components/suggest/suggest'
+import Scroll from 'base/scroll/scroll'
+import SongList from 'base/song-list/song-list'
+import TopTip from 'base/top-tip/top-tip'
+import SearchList from 'base/search-list/search-list'
+
+import { Song } from 'common/js/song'
 import { searchMixins } from 'common/js/mixin'
+import { mapGetters, mapActions } from 'vuex'
 export default {
-  components: { SearchBox, Suggest, Switchs },
+  components: {
+    SearchBox,
+    Suggest,
+    Switchs,
+    Scroll,
+    SongList,
+    SearchList,
+    TopTip
+  },
   mixins: [searchMixins],
   data() {
     return {
       showList: false,
+      showSinger: false,
       currentIndex: 0,
       tabs: [{ name: '最近播放' }, { name: '搜索历史' }]
     }
   },
+  computed: {
+    ...mapGetters({
+      playHistory: 'playHistory',
+      searchHistory: 'searchHistory'
+    })
+  },
   methods: {
     show() {
       this.showList = true
+      setTimeout(() => {
+        if (this.currentIndex === 0) {
+          this.$refs.songList.refresh()
+        } else {
+          this.$refs.searchBox.refresh()
+        }
+      }, 20)
     },
     hide() {
       this.showList = false
     },
     changeIndex(index) {
       this.currentIndex = index
-    }
+    },
+    selectSong(song, index) {
+      if (index !== 0) {
+        this.insertSong(new Song(song))
+
+        this.$refs.topTip.show()
+      }
+    },
+    selectSuggest() {
+      console.log('in')
+      this.$refs.topTip.show()
+      this.saveSearch()
+    },
+    ...mapActions(['insertSong'])
   }
 }
 </script>

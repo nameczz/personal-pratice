@@ -59,7 +59,8 @@ export const playerMixins = {
     ...mapMutations({
       setCurrentIndex: 'SET_CURRENT_INDEX',
       setPlayingMode: 'SET_PLAY_MODE',
-      setPlayList: 'SET_PLAYLIST'
+      setPlayList: 'SET_PLAYLIST',
+      setPlayingStatus: 'SET_PLAYING_STATE'
     })
   }
 }
@@ -75,6 +76,7 @@ export const searchMixins = {
   },
   methods: {
     addQuery(query) {
+      console.log('---query---', this.$refs.searchBox)
       this.$refs.searchBox.setQuery(query)
     },
     // 关闭手机键盘 派发了2个事件上来

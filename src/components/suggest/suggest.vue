@@ -106,7 +106,6 @@ export default {
       this.$refs.suggest.scrollTo(0, 0)
       search(this.query, this.page, this.showSinger, PERPAGE)
         .then(res => {
-          console.log('search----')
           if (res.code === ERR_OK) {
             this._genResult(res.data).then(result => {
               this.result = this.result.concat(result)

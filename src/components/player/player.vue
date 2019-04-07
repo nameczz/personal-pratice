@@ -507,7 +507,7 @@ export default {
     showPlaylist() {
       this.$refs.playlist.show()
     },
-    ...mapActions({ savePlayHistory: 'SET_PLAY_HISTORY' })
+    ...mapActions({ savePlayHistory: 'savePlayHistory' })
   },
   watch: {
     currentSong(newSong, oldSong) {

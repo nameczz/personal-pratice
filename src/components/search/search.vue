@@ -13,6 +13,7 @@
     >
       <scroll
         :data="shotcut"
+        :refreshTime="100"
         class="shortcut"
         ref="shortcut"
       >

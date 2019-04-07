@@ -30,6 +30,7 @@
         </div>
         <scroll
           :data="sequenceList"
+          :refreshTime="100"
           class="list-content"
           ref="scroll"
         >
